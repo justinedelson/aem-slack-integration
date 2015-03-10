@@ -124,11 +124,11 @@ public class Notifier {
                     }
 
                     if (viewerPath != null) {
-                        JSONObject json = new JSONObject();
-                        json.put("text", String.format(
+                        String text = String.format(
                                 "User %s created comment '%s'. Click <%s|here> to view the asset.",
-                                comment.getAuthorName(), comment.getMessage(), viewerPath));
-                        sendMessage(json);
+                                comment.getAuthorName(), comment.getMessage(), viewerPath);
+                        SlackMessage msg = new SlackMessage(text);
+                        sendMessage(msg);
                     }
                 }
             } catch (Exception e) {
@@ -206,9 +206,9 @@ public class Notifier {
         queue.shutdownNow();
     }
 
-    private void sendMessage(JSONObject obj) throws HttpException, IOException {
+    private void sendMessage(SlackMessage msg) throws HttpException, IOException {
         PostMethod pm = new PostMethod(url);
-        pm.setRequestEntity(new StringRequestEntity(obj.toString(), "application/json", "UTF-8"));
+        pm.setRequestEntity(new StringRequestEntity(msg.toJsonString(), "application/json", "UTF-8"));
         httpClient.executeMethod(pm);
     }
 }
