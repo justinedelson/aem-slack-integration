@@ -87,7 +87,15 @@ public class Notifier {
                 if (task != null) {
                     String assignee = task.getCurrentAssignee();
 
-                    // TODO
+                    String slackUsername = usernameMappings.get(assignee);
+                    if (slackUsername != null) {
+                        String text = String.format("%s Click <%s|here> to view your task list.",
+                                task.getDescription(),
+                                externalizer.authorLink(resolver, "/notifications.html"));
+                        SlackMessage msg = new SlackMessage(text);
+                        msg.setChannel("@" + slackUsername);
+                        sendMessage(msg);
+                    }
                 }
             } catch (Exception e) {
                 log.error("Unable to submit comment notification to Slack");
