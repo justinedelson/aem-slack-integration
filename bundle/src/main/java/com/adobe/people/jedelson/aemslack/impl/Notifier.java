@@ -39,7 +39,6 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ResourceResolverFactory;
-import org.apache.sling.commons.json.JSONObject;
 import org.apache.sling.commons.osgi.PropertiesUtil;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -60,7 +59,8 @@ import com.adobe.granite.taskmanagement.TaskEventType;
 import com.adobe.granite.taskmanagement.TaskManager;
 import com.day.cq.commons.Externalizer;
 
-@Component(policy = ConfigurationPolicy.REQUIRE, metatype = true)
+@Component(policy = ConfigurationPolicy.REQUIRE, metatype = true, label = "AEM Slack Integration - Notifier",
+        description = "Event handler for passing AEM notifications to Slack")
 public class Notifier {
 
     public class TaskListener implements EventHandler {
@@ -166,10 +166,12 @@ public class Notifier {
 
     private static final Logger log = LoggerFactory.getLogger(Notifier.class);
 
-    @Property
+    @Property(label = "Slack Incoming WebHook URL",
+            description = "URL provided by Slack as the Incoming WebHook endpoint.")
     private static final String PROP_URL = "url";
 
-    @Property(unbounded = PropertyUnbounded.ARRAY)
+    @Property(unbounded = PropertyUnbounded.ARRAY, label = "AEM to Slack Username Mapping",
+            description = "Mapping between AEM and Slack usernames. In the form <aemname>=<slackname>.")
     private static final String PROP_MAPPING = "username.mapping";
 
     @Reference
@@ -207,10 +209,10 @@ public class Notifier {
 
         BundleContext bundleContext = ctx.getBundleContext();
         Hashtable<String, Object> serviceProps = new Hashtable<String, Object>();
-        serviceProps.put(EventConstants.EVENT_TOPIC, CommentingEvent.EVENT_TOPIC_BASE + "/"
-                + CommentingEvent.Type.COMMENTED.name().toLowerCase());
-        commentListenerRegistration = bundleContext.registerService(EventHandler.class.getName(),
-                new CommentListener(), serviceProps);
+        serviceProps.put(EventConstants.EVENT_TOPIC,
+                CommentingEvent.EVENT_TOPIC_BASE + "/" + CommentingEvent.Type.COMMENTED.name().toLowerCase());
+        commentListenerRegistration = bundleContext.registerService(EventHandler.class.getName(), new CommentListener(),
+                serviceProps);
 
         serviceProps.put(EventConstants.EVENT_TOPIC, TaskEvent.TOPIC);
         taskListenerRegistration = bundleContext.registerService(EventHandler.class.getName(), new TaskListener(),
