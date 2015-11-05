@@ -107,8 +107,7 @@ public class Notifier {
                     String slackUsername = usernameMappings.get(assignee);
                     if (slackUsername != null) {
                         String text = String.format("New task received. %s Click <%s|here> to view your task list.",
-                                task.getDescription(),
-                                externalizer.authorLink(resolver, "/notifications.html"));
+                                task.getDescription(), externalizer.authorLink(resolver, "/notifications.html"));
                         SlackMessage msg = new SlackMessage(text);
                         msg.setChannel("@" + slackUsername);
                         sendMessage(msg);
@@ -149,9 +148,16 @@ public class Notifier {
                     }
 
                     if (viewerPath != null) {
-                        String text = String.format(
-                                "User %s created comment '%s'. Click <%s|here> to view the asset.",
-                                comment.getAuthorName(), comment.getMessage(), viewerPath);
+                        String author = comment.getAuthorName();
+                        String text;
+                        String slackUsername = usernameMappings.get(author);
+                        if (slackUsername != null) {
+                            text = String.format("User <@%s> created comment '%s'. Click <%s|here> to view the asset.",
+                                    slackUsername, comment.getMessage(), viewerPath);
+                        } else {
+                            text = String.format("User %s created comment '%s'. Click <%s|here> to view the asset.",
+                                    author, comment.getMessage(), viewerPath);
+                        }
                         SlackMessage msg = new SlackMessage(text);
                         sendMessage(msg);
                     }
