@@ -106,7 +106,7 @@ public class Notifier {
 
                     String slackUsername = usernameMappings.get(assignee);
                     if (slackUsername != null) {
-                        String text = String.format("%s Click <%s|here> to view your task list.",
+                        String text = String.format("New task received. %s Click <%s|here> to view your task list.",
                                 task.getDescription(),
                                 externalizer.authorLink(resolver, "/notifications.html"));
                         SlackMessage msg = new SlackMessage(text);
